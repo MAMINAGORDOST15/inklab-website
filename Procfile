@@ -1,1 +1,1 @@
-web: python3 -m http.server ${PORT:-8000}
+web: npx serve -s . -l $PORT
