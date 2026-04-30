@@ -828,16 +828,18 @@
         const el = entry.target;
         const target = parseInt(el.dataset.target);
         const suffix = el.dataset.suffix || '';
+        const duration = 2000;
+        const steps = 60;
+        const step = target / steps;
         let current = 0;
-        const step = target / 50;
         const timer = setInterval(() => {
           current += step;
           if (current >= target) {
             current = target;
             clearInterval(timer);
-          }
-          el.textContent = Math.round(current) + suffix;
-        }, 30);
+         }
+         el.textContent = Math.round(current) + suffix;
+       }, duration / steps);
         counterObserver.unobserve(el);
       }
     });
