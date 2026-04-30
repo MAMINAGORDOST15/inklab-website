@@ -963,6 +963,17 @@
     }
   });
 </script>
+<!-- SCROLL PROGRESS -->
+<div id="scrollProgress" style="position: fixed; top: 0; left: 0; width: 3px; height: 0%; z-index: 9999; background: linear-gradient(to bottom, #ff6b35, #ff3d7f); transition: height 0.1s linear;"></div>
+
+<script>
+  window.addEventListener('scroll', function() {
+    var scrolled = window.scrollY;
+    var total = document.documentElement.scrollHeight - window.innerHeight;
+    var percent = (scrolled / total) * 100;
+    document.getElementById('scrollProgress').style.height = percent + '%';
+  });
+</script>
 </body>
 </html>
 </body>
