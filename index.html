@@ -656,7 +656,9 @@
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="nav-logo">Ink Lab</a>
+  <a href="#" class="nav-logo">
+  <img src="/logo.jpg" alt="INK LAB" style="height: 40px; filter: invert(1);">
+</a>
   <ul class="nav-links">
     <li><a href="#about">О курсе</a></li>
     <li><a href="#program">Программа</a></li>
@@ -904,7 +906,7 @@
 
   // Hero drop image — use the actual logo
   const heroDropImg = document.getElementById('heroDropImg');
-  heroDropImg.src = '/mnt/user-data/uploads/штлдфи.jfif';
+  heroDropImg.src = '/logo.jpg';
   heroDropImg.onerror = () => heroDropImg.style.display = 'none';
 
   // Buy button — placeholder
