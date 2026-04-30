@@ -2,7 +2,7 @@
   "name": "inklab-website",
   "version": "1.0.0",
   "scripts": {
-    "start": "npx serve . -l $PORT"
+    "start": "npx serve . -l ${PORT:-8080}"
   },
   "dependencies": {
     "serve": "^14.0.0"
