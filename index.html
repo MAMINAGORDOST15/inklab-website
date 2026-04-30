@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INK LAB — Школа тату-мастерства</title>
+<link rel="icon" type="image/png" href="/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --white: #f8f5f0;
+    --gray: #1a1a1a;
+    --accent: #ff6b35;
+    --accent-2: #ff3d7f;
+    --text-muted: #555;
+  }
+
+
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: #f8f5f0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+  }
+
+  @media (min-width: 901px) {
+    body { cursor: none; }
+  }
+
+  .cursor {
+    width: 8px; height: 8px;
+    background: var(--white);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.15s ease;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    mix-blend-mode: difference;
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-weight: 300;
+    letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--white); text-decoration: none;
+  }
+
+  .nav-links { display: flex; gap: 3rem; list-style: none; }
+  .nav-links a {
+    color: var(--white); text-decoration: none;
+    font-size: 0.7rem; letter-spacing: 0.2em;
+    text-transform: uppercase; opacity: 0.7; transition: opacity 0.3s;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  .hero {
+    height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    position: relative; overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0.04;
+  }
+
+  .hero-bg-drop {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #fff 0%, transparent 70%);
+    filter: blur(60px);
+  }
+
+  .hero-eyebrow {
+    font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 2rem; opacity: 0;
+    animation: fadeUp 1s ease 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(5rem, 12vw, 11rem);
+    font-weight: 300; line-height: 0.9; text-align: center;
+    letter-spacing: -0.02em; opacity: 0;
+    animation: fadeUp 1s ease 0.5s forwards;
+  }
+
+  .hero-title em { font-style: italic; color: var(--accent); }
+
+  .hero-subtitle {
+    margin-top: 3rem; font-size: 0.75rem;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    opacity: 0; color: rgba(240,237,232,0.5);
+    animation: fadeUp 1s ease 0.7s forwards;
+  }
+
+  .hero-drop {
+    position: absolute; right: 8%; top: 50%;
+    transform: translateY(-50%); width: 180px;
+    opacity: 0; animation: fadeIn 1.5s ease 1s forwards;
+  }
+  .hero-drop img { width: 100%; filter: drop-shadow(0 0 40px rgba(255,107,53,0.2)); }
+
+  .hero-scroll {
+    position: absolute; bottom: 3rem; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0.8rem; opacity: 0;
+    animation: fadeIn 1s ease 1.5s forwards;
+  }
+  .hero-scroll span { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.4; }
+  .scroll-line {
+    width: 1px; height: 60px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+    animation: scrollPulse 2s ease infinite;
+  }
+
+  .marquee-wrap {
+    padding: 2rem 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    overflow: hidden; background: var(--gray);
+  }
+  .marquee { display: flex; gap: 4rem; animation: marquee 20s linear infinite; white-space: nowrap; }
+  .marquee span { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.4; flex-shrink: 0; }
+  .marquee .dot { color: var(--accent); opacity: 1; }
+
+  .section { padding: 10rem 4rem; max-width: 1400px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 4rem; display: flex; align-items: center; gap: 1rem;
+  }
+  .section-label::after { content: ''; width: 40px; height: 1px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; align-items: center; }
+
+  .about-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 300; line-height: 1.1; margin-bottom: 3rem;
+  }
+
+  .about-title em, .hero-title em, .features-title em, .bot-card-title em {
+    font-style: italic;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .about-text { font-size: 0.9rem; line-height: 2; opacity: 0.8; margin-bottom: 2rem; }
+
+  .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 4rem; }
+  .stat { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.5rem; }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-weight: 300;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    line-height: 1;
+  }
+  .stat-label { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.4; margin-top: 0.5rem; }
+
+  .features { background: var(--gray); padding: 10rem 4rem; }
+  .features-inner { max-width: 1400px; margin: 0 auto; }
+  .features-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300; margin-bottom: 6rem; max-width: 600px; line-height: 1.1; }
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(255,255,255,0.06); }
+  .feature-item { background: var(--gray); padding: 3rem; transition: background 0.3s; }
+  .feature-item:hover { background: #222; }
+  .feature-num { font-family: 'Cormorant Garamond', serif; font-size: 4rem; font-weight: 300; color: rgba(255,107,53,0.5); line-height: 1; margin-bottom: 1.5rem; }
+  .feature-title { font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem; }
+  .feature-text { font-size: 0.85rem; line-height: 1.8; opacity: 0.75; }
+
+  /* FOUNDER */
+  .founder { padding: 10rem 4rem; max-width: 1400px; margin: 0 auto; }
+  .founder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; align-items: center; }
+  .founder-images { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .founder-img { width: 100%; aspect-ratio: 3/4; object-fit: cover; filter: grayscale(20%); transition: filter 0.3s; }
+  .founder-img:hover { filter: grayscale(0%); }
+  .founder-img:first-child { margin-top: 4rem; }
+  .founder-name {
+    font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-weight: 300;
+    margin-bottom: 0.5rem; line-height: 1;
+  }
+  .founder-role {
+    font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 3rem;
+  }
+  .founder-text { font-size: 0.9rem; line-height: 2; opacity: 0.75; margin-bottom: 1.5rem; }
+  .founder-stat { display: flex; gap: 3rem; margin-top: 3rem; }
+  .founder-stat-item { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem; flex: 1; }
+  .founder-stat-num {
+    font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 300;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .founder-stat-label { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.4; margin-top: 0.3rem; }
+
+  /* REVIEWS */
+  .reviews { background: var(--gray); padding: 10rem 4rem; }
+  .reviews-inner { max-width: 1400px; margin: 0 auto; }
+  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 2rem; }
+  .review-card {
+    background: var(--black); padding: 2.5rem;
+    border: 1px solid rgba(255,255,255,0.06);
+    position: relative; transition: border-color 0.3s;
+  }
+  .review-card:hover { border-color: rgba(255,107,53,0.3); }
+  .review-card::before {
+    content: '"';
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 6rem; font-weight: 300;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    line-height: 1; display: block; margin-bottom: 1rem; opacity: 0.5;
+  }
+  .review-text { font-size: 0.85rem; line-height: 1.9; opacity: 0.75; margin-bottom: 2rem; }
+  .review-author { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.4; }
+
+  /* PRICING */
+  .pricing { padding: 10rem 4rem; max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; align-items: center; }
+  .pricing-label {
+    font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 2rem;
+  }
+  .pricing-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 300; line-height: 1.2; margin-bottom: 3rem; }
+  .pricing-price {
+    font-family: 'Cormorant Garamond', serif; font-size: 6rem; font-weight: 300;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    line-height: 1; margin-bottom: 0.5rem;
+  }
+  .pricing-period { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.4; margin-bottom: 3rem; }
+  .pricing-includes { list-style: none; margin-bottom: 3rem; }
+  .pricing-includes li {
+    font-size: 0.8rem; padding: 1rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    opacity: 0.7; display: flex; align-items: center; gap: 1rem;
+  }
+  .pricing-includes li::before {
+    content: '—';
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    flex-shrink: 0;
+  }
+
+  /* COUNTDOWN */
+  .countdown-wrap { margin-top: 3rem; margin-bottom: 3rem; }
+  .countdown-label { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.5; margin-bottom: 1rem; }
+  .countdown { display: flex; gap: 1.5rem; }
+  .countdown-item { text-align: center; }
+  .countdown-num {
+    font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-weight: 300;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    line-height: 1; display: block;
+  }
+  .countdown-unit { font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.4; margin-top: 0.3rem; }
+
+  /* GUARANTEE */
+  .guarantee {
+    background: var(--gray); padding: 6rem 4rem;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .guarantee-inner {
+    max-width: 1400px; margin: 0 auto;
+    display: flex; align-items: center; gap: 6rem;
+  }
+  .guarantee-icon {
+    font-size: 5rem; flex-shrink: 0;
+    filter: drop-shadow(0 0 20px rgba(255,107,53,0.3));
+  }
+  .guarantee-title { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 300; margin-bottom: 1rem; }
+  .guarantee-text { font-size: 0.85rem; line-height: 2; opacity: 0.7; }
+
+  /* FAQ */
+  .faq { padding: 10rem 4rem; max-width: 1000px; margin: 0 auto; }
+  .faq-item { border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .faq-question {
+    width: 100%; padding: 2rem 0;
+    display: flex; justify-content: space-between; align-items: center;
+    background: none; border: none; color: var(--white);
+    font-family: 'Montserrat', sans-serif; font-size: 0.9rem;
+    font-weight: 400; text-align: left; cursor: none;
+    transition: opacity 0.3s;
+  }
+  .faq-question:hover { opacity: 0.7; }
+  .faq-icon {
+    font-size: 1.2rem; flex-shrink: 0; margin-left: 2rem;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    transition: transform 0.3s;
+  }
+  .faq-answer { font-size: 0.85rem; line-height: 2; opacity: 0.6; max-height: 0; overflow: hidden; transition: all 0.4s ease; padding-bottom: 0; }
+  .faq-item.open .faq-answer { max-height: 300px; padding-bottom: 2rem; }
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+  /* BOT */
+  .bot-section { background: var(--gray); padding: 10rem 4rem; }
+  .bot-inner { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; align-items: center; }
+  .bot-card {
+    background: var(--black); border: 1px solid rgba(255,255,255,0.08);
+    padding: 3rem; position: relative;
+  }
+  .bot-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right, transparent, var(--accent), var(--accent-2), transparent);
+  }
+  .bot-icon { font-size: 3rem; margin-bottom: 1.5rem; }
+  .bot-card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; margin-bottom: 1rem; }
+  .bot-card-text { font-size: 0.8rem; line-height: 1.8; opacity: 0.5; margin-bottom: 2rem; }
+  .bot-features { list-style: none; margin-bottom: 2rem; }
+  .bot-features li { font-size: 0.75rem; padding: 0.6rem 0; opacity: 0.6; display: flex; align-items: center; gap: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .bot-features li span {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    font-size: 0.6rem;
+  }
+
+  .btn-primary {
+    display: inline-block; padding: 1.2rem 3rem;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: var(--white); text-decoration: none;
+    font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+    font-weight: 500; transition: all 0.3s; cursor: none;
+  }
+  .btn-primary:hover { opacity: 0.85; transform: translateY(-2px); }
+
+  .btn-outline {
+    display: inline-block; padding: 1.2rem 3rem;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--white); text-decoration: none;
+    font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+    transition: all 0.3s; cursor: none; margin-left: 1rem;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  footer {
+    padding: 4rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.5; }
+  .footer-copy { font-size: 0.65rem; letter-spacing: 0.15em; opacity: 0.3; }
+
+  /* POPUP */
+  .popup-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 9000; display: flex;
+    align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.5s;
+  }
+  .popup-overlay.visible { opacity: 1; pointer-events: all; }
+  .popup {
+    background: var(--gray); border: 1px solid rgba(255,255,255,0.1);
+    padding: 4rem; max-width: 500px; width: 90%;
+    position: relative; transform: translateY(30px);
+    transition: transform 0.5s;
+  }
+  .popup-overlay.visible .popup { transform: translateY(0); }
+  .popup::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  }
+  .popup-close {
+    position: absolute; top: 1.5rem; right: 1.5rem;
+    background: none; border: none; color: var(--white);
+    font-size: 1.5rem; cursor: none; opacity: 0.4; transition: opacity 0.3s;
+  }
+  .popup-close:hover { opacity: 1; }
+  .popup-title { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 300; margin-bottom: 1rem; line-height: 1.1; }
+  .popup-text { font-size: 0.8rem; line-height: 1.9; opacity: 0.6; margin-bottom: 2rem; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scrollPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 1.5rem 2rem; }
+    .nav-links { display: none; }
+    .section { padding: 4rem 1.5rem; }
+    .about-grid, .pricing, .bot-inner, .founder-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .features { padding: 4rem 1.5rem; }
+    .features-grid { grid-template-columns: 1fr; }
+    .reviews-grid { grid-template-columns: 1fr; }
+    .hero-drop { display: none; }
+    .hero-title { font-size: 4rem; line-height: 1; }
+    .hero-eyebrow { font-size: 0.55rem; letter-spacing: 0.2em; text-align: center; }
+    .hero-subtitle { font-size: 0.6rem; letter-spacing: 0.15em; text-align: center; padding: 0 1rem; }
+    .hero { padding: 0 1.5rem; }
+    .about-title { font-size: 2rem; }
+    .features-title { font-size: 2rem; }
+    .pricing-price { font-size: 4rem; }
+    .pricing-title { font-size: 1.8rem; }
+    .bot-card { padding: 2rem; }
+    .feature-item { padding: 2rem; }
+    .marquee span { font-size: 0.55rem; }
+    .btn-outline { margin-left: 0; margin-top: 1rem; display: block; text-align: center; }
+    .hero-scroll { display: none; }
+    .cursor, .cursor-ring { display: none; }
+    .founder-images { grid-template-columns: 1fr; }
+    .founder-img:first-child { margin-top: 0; }
+    .guarantee-inner { flex-direction: column; gap: 2rem; text-align: center; }
+    .faq { padding: 4rem 1.5rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem; }
+    .founder { padding: 4rem 1.5rem; }
+    .reviews { padding: 4rem 1.5rem; }
+    .guarantee { padding: 4rem 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- POPUP -->
+<div class="popup-overlay" id="popup">
+  <div class="popup">
+    <button class="popup-close" id="popupClose">×</button>
+    <div class="popup-title">Хочешь узнать<br><em>больше?</em></div>
+    <p class="popup-text">Напиши нам в Telegram — расскажем всё о курсе, ответим на вопросы и поможем определиться. Старт потока 1 июля!</p>
+    <a href="https://t.me/INKLABSCHOOLBOT" target="_blank" class="btn-primary">Написать в Telegram</a>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="/logo.png" alt="INK LAB" style="height: 40px; filter: invert(1);">
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about" data-ru="О курсе" data-en="About">О курсе</a></li>
+    <li><a href="#founder" data-ru="Основатель" data-en="Founder">Основатель</a></li>
+    <li><a href="#program" data-ru="Программа" data-en="Program">Программа</a></li>
+    <li><a href="#pricing" data-ru="Стоимость" data-en="Pricing">Стоимость</a></li>
+    <li><a href="#bot" data-ru="Бот" data-en="Bot">Бот</a></li>
+  </ul>
+
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"><div class="hero-bg-drop"></div></div>
+  <p class="hero-eyebrow">Онлайн школа тату-мастерства</p>
+  <h1 class="hero-title">INK<br><em>LAB</em></h1>
+  <p class="hero-subtitle">Стань профессиональным тату-мастером за 3 месяца</p>
+  <div class="hero-drop">
+    <img src="/logo.png" alt="" id="heroDropImg">
+  </div>
+  <div class="hero-scroll">
+    <span>Листай</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span>Теория тату</span><span class="dot">✦</span>
+    <span>Практика</span><span class="dot">✦</span>
+    <span>Фотография работ</span><span class="dot">✦</span>
+    <span>Нейросети для тату</span><span class="dot">✦</span>
+    <span>Instagram мастера</span><span class="dot">✦</span>
+    <span>3 месяца обучения</span><span class="dot">✦</span>
+    <span>Теория тату</span><span class="dot">✦</span>
+    <span>Практика</span><span class="dot">✦</span>
+    <span>Фотография работ</span><span class="dot">✦</span>
+    <span>Нейросети для тату</span><span class="dot">✦</span>
+    <span>Instagram мастера</span><span class="dot">✦</span>
+    <span>3 месяца обучения</span><span class="dot">✦</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section">
+    <div class="section-label">О школе</div>
+    <div class="about-grid">
+      <div class="reveal">
+        <h2 class="about-title">Искусство нанесённое<br>на <em>кожу</em> — это<br>профессия</h2>
+        <p class="about-text">INK LAB — это не просто курс. Это полное погружение в мир тату-мастерства. За 3 месяца интенсивного обучения вы пройдёте путь от нуля до уверенного профессионала, готового принимать клиентов.</p>
+        <p class="about-text">Живые уроки, домашние задания с обратной связью от мастера, личный куратор и комьюнити единомышленников — всё это ждёт вас в INK LAB.</p>
+      </div>
+      <div class="reveal">
+        <div class="about-stats">
+          <div class="stat">
+            <div class="stat-num" data-target="3">0</div>
+            <div class="stat-label">Месяца обучения</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">∞</div>
+            <div class="stat-label">Поддержка куратора</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num" data-target="100">0</div>
+            <div class="stat-label">% Онлайн формат</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num" data-target="10">0</div>
+            <div class="stat-label">+ Лет опыта мастера</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDER -->
+<section id="founder" style="background: var(--gray);">
+  <div class="founder">
+    <div class="section-label">Основатель</div>
+    <div class="founder-grid">
+      <div class="reveal founder-images">
+        <img src="/founder1.jpg" alt="Александр Семенюта" class="founder-img">
+        <img src="/founder2.jpg" alt="INK LAB обучение" class="founder-img">
+      </div>
+      <div class="reveal">
+        <div class="founder-name">Александр<br>Семенюта</div>
+        <div class="founder-role">Тату-мастер • Основатель INK LAB</div>
+        <p class="founder-text">Меня зовут Александр. Я тату-мастер из Израиля с 10-летним опытом за плечами. За это время я сделал тысячи работ и создал столько же уникальных эскизов.</p>
+        <p class="founder-text">Теперь я хочу передать весь свой огромный опыт и создать новое поколение качественных профессиональных тату-мастеров. INK LAB — это моя миссия.</p>
+        <div class="founder-stat">
+          <div class="founder-stat-item">
+            <div class="founder-stat-num stat-num" data-target="10" data-suffix="+">0</div>
+            <div class="founder-stat-label">Лет опыта</div>
+          </div>
+          <div class="founder-stat-item">
+            <div class="founder-stat-num stat-num" data-target="1000" data-suffix="+">0</div>
+            <div class="founder-stat-label">Работ</div>
+          </div>
+          <div class="founder-stat-item">
+            <div class="founder-stat-num stat-num" data-target="20" data-suffix="K">0</div>
+            <div class="founder-stat-label">Подписчиков</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="program" class="features">
+  <div class="features-inner">
+    <div class="section-label">Программа</div>
+    <h2 class="features-title reveal">Всё что нужно для <em>профессии</em></h2>
+    <div class="features-grid">
+      <div class="feature-item reveal">
+        <div class="feature-num">01</div>
+        <div class="feature-title">Теория и история</div>
+        <div class="feature-text">Полная теоретическая база — история тату, стили, техники, инструменты и материалы. Всё что нужно знать перед первой иглой.</div>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-num">02</div>
+        <div class="feature-title">Практика</div>
+        <div class="feature-text">Пошаговые практические задания с живой обратной связью от мастера. Каждое ДЗ — шаг к вашей первой татуировке.</div>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-num">03</div>
+        <div class="feature-title">Фотография работ</div>
+        <div class="feature-text">Освоите искусство съёмки и обработки тату-работ. Ваше портфолио будет выглядеть профессионально с первого дня.</div>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-num">04</div>
+        <div class="feature-title">Нейросети в тату</div>
+        <div class="feature-text">Изучите самые актуальные AI-инструменты для тату-сферы. Генерация эскизов, работа с клиентами, автоматизация рутины.</div>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-num">05</div>
+        <div class="feature-title">Профиль мастера</div>
+        <div class="feature-text">Полный гайд по созданию и ведению профессионального аккаунта тату-мастера. Привлечение клиентов с первого месяца.</div>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-num">06</div>
+        <div class="feature-title">Поддержка и комьюнити</div>
+        <div class="feature-text">Личный куратор, Telegram-бот для обучения и живое комьюнити единомышленников. Вы никогда не будете учиться в одиночку.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews">
+  <div class="reviews-inner">
+    <div class="section-label">Отзывы</div>
+    <h2 class="features-title reveal">Говорят <em>ученики</em></h2>
+    <div class="reviews-grid">
+      <div class="review-card reveal">
+        <div class="review-text">Подробно разобрали мой Instagram профиль. Саша обратил внимание на моменты, о которых я забыл или вообще не думал. Поговорили о форме в создании проектов, чего не хватает в моих работах и что можно добавить.</div>
+        <div class="review-author">@bobo.tat</div>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-text">Было очень информативно, спасибо! До этого не было понимания куда двигаться, с чего начать, как вообще набрать аудиторию. Сейчас я заряжена вдохновением, есть план, понимание куда расти. Ожидала меньшего — очень довольна!</div>
+        <div class="review-author">Ученица INK LAB</div>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-text">Хочу ещё раз поблагодарить за такую долгую и полезную консультацию. Очень много полезной информации. Я чувствую такой моральный подъём после занятия — эмоциональный буст. Приятно было познакомиться!</div>
+        <div class="review-author">Ученик INK LAB</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPOTS COUNTER -->
+<div style="background: var(--black); padding: 3rem 4rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04);">
+  <div style="max-width: 600px; margin: 0 auto;">
+    <div style="font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase; background: linear-gradient(90deg, #ff6b35, #ff3d7f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem;">Набор открыт</div>
+    <div style="font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 300; margin-bottom: 1.5rem;">Осталось <em style="background: linear-gradient(90deg, #ff6b35, #ff3d7f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-style: italic;">20 мест</em> из 100</div>
+    <div style="background: rgba(255,255,255,0.04); border-radius: 2px; height: 4px; max-width: 400px; margin: 0 auto 2rem;">
+      <div style="background: linear-gradient(90deg, #ff6b35, #ff3d7f); height: 100%; width: 20%; border-radius: 2px;"></div>
+    </div>
+    <p style="font-size: 0.8rem; opacity: 0.5; line-height: 1.8;">Поток стартует 1 июля. Когда места закончатся — запись закрывается до следующего потока.</p>
+  </div>
+</div>
+
+<!-- GUARANTEE -->
+<div class="guarantee">
+  <div class="guarantee-inner reveal">
+    <div class="guarantee-icon">🛡️</div>
+    <div>
+      <div class="guarantee-title">Гарантия возврата</div>
+      <p class="guarantee-text">Если после первого урока курс тебе не подойдёт — мы вернём деньги полностью. Без вопросов, без условий. Мы уверены в качестве того что делаем.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="pricing">
+    <div class="reveal">
+      <div class="pricing-label">Инвестиция в себя</div>
+      <h2 class="pricing-title">Полный курс тату-мастерства</h2>
+      <div class="pricing-price">$1000</div>
+      <div class="pricing-period">3 месяца обучения</div>
+
+      <div class="countdown-wrap">
+        <div class="countdown-label">До старта потока 1 июля:</div>
+        <div class="countdown">
+          <div class="countdown-item">
+            <span class="countdown-num" id="cd-days">00</span>
+            <div class="countdown-unit">дней</div>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-num" id="cd-hours">00</span>
+            <div class="countdown-unit">часов</div>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-num" id="cd-minutes">00</span>
+            <div class="countdown-unit">минут</div>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-num" id="cd-seconds">00</span>
+            <div class="countdown-unit">секунд</div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="pricing-includes">
+        <li>Полная теоретическая база</li>
+        <li>Практические задания с фидбеком</li>
+        <li>Личный куратор на весь курс</li>
+        <li>Модуль по фотографии работ</li>
+        <li>AI-инструменты для тату</li>
+        <li>Гайд по ведению аккаунта</li>
+        <li>Доступ к комьюнити мастеров</li>
+        <li>Telegram-бот для обучения</li>
+        <li>Гарантия возврата после первого урока</li>
+      </ul>
+      <a href="#" class="btn-primary" id="buyBtn">Записаться на курс</a>
+    </div>
+    <div class="reveal" style="text-align: center;">
+      <div style="font-family: 'Cormorant Garamond', serif; font-size: 10rem; font-weight: 300; color: rgba(255,107,53,0.06); line-height: 1;">✦</div>
+      <p style="font-size: 0.8rem; opacity: 0.4; line-height: 2; max-width: 300px; margin: 0 auto;">Места ограничены. Следующий поток начинается 1 июля — успей занять место.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="background: var(--gray); padding: 2rem 0;">
+  <div class="faq">
+    <div class="section-label">FAQ</div>
+    <h2 class="features-title reveal" style="margin-bottom: 4rem;">Частые <em>вопросы</em></h2>
+
+    <div class="faq-item">
+      <button class="faq-question">Нужен ли опыт в тату чтобы поступить? <span class="faq-icon">+</span></button>
+      <div class="faq-answer">Нет, опыт не нужен совсем. Курс разработан с нуля и подходит как для полных новичков, так и для тех у кого уже есть базовые навыки. Мы начинаем с основ и постепенно движемся к профессиональному уровню.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Как проходят занятия? <span class="faq-icon">+</span></button>
+      <div class="faq-answer">Раз в неделю открываются новые уроки на платформе GetCourse. После каждого урока нужно выполнить домашнее задание и отправить его учителю через Telegram-бот. Учитель даёт обратную связь лично.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Сколько времени нужно уделять в неделю? <span class="faq-icon">+</span></button>
+      <div class="faq-answer">В среднем 5-10 часов в неделю — просмотр уроков, выполнение практических заданий и общение с куратором. Расписание гибкое, можно учиться в удобное время.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Что нужно для обучения? <span class="faq-icon">+</span></button>
+      <div class="faq-answer">Смартфон или компьютер для просмотра уроков, Telegram для работы с ботом и общения с куратором. Список необходимых материалов для практики будет отправлен после записи.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Когда старт следующего потока? <span class="faq-icon">+</span></button>
+      <div class="faq-answer">Следующий поток стартует 1 июля 2025 года. Количество мест ограничено — рекомендуем записываться заранее.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Есть ли гарантия возврата денег? <span class="faq-icon">+</span></button>
+      <div class="faq-answer">Да! Если после первого урока курс тебе не подойдёт — мы вернём деньги полностью. Без вопросов и условий. Мы уверены в качестве нашего продукта.</div>
+    </div>
+  </div>
+</section>
+
+<!-- BOT SECTION -->
+<section id="bot" class="bot-section">
+  <div class="bot-inner">
+    <div class="reveal">
+      <div class="section-label">Telegram бот</div>
+      <h2 class="about-title">Уже купил курс?<br>Подключай <em>бота</em></h2>
+      <p class="about-text">Наш Telegram-бот — неотъемлемая часть обучения в INK LAB. Через него ты сдаёшь домашние задания, получаешь обратную связь от учителя, следишь за своим прогрессом и остаёшься на связи с комьюнити.</p>
+      <a href="https://t.me/INKLABSCHOOLBOT" target="_blank" class="btn-primary">Открыть бота</a>
+    </div>
+    <div class="reveal">
+      <div class="bot-card">
+        <div class="bot-icon">🖤</div>
+        <div class="bot-card-title">INK LAB Bot</div>
+        <div class="bot-card-text">Твой личный помощник в обучении. Всегда на связи, всегда готов помочь.</div>
+        <ul class="bot-features">
+          <li><span>✦</span> Отправка домашних заданий</li>
+          <li><span>✦</span> Фидбек от учителя</li>
+          <li><span>✦</span> Личный профиль и прогресс</li>
+          <li><span>✦</span> Система уровней и достижений</li>
+          <li><span>✦</span> Расписание занятий</li>
+          <li><span>✦</span> Галерея работ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTAGRAM -->
+<section style="padding: 8rem 4rem; text-align: center; max-width: 1400px; margin: 0 auto;">
+  <div class="section-label" style="justify-content: center;">Instagram</div>
+  <h2 class="features-title reveal" style="text-align: center; margin: 0 auto 2rem; max-width: 600px;">Смотри мои <em>работы</em></h2>
+  <p class="about-text reveal" style="text-align: center; max-width: 500px; margin: 0 auto 3rem;">Тысячи работ, сотни эскизов — всё это в моём Instagram. Подпишись чтобы следить за новыми проектами и вдохновляться.</p>
+  <a href="https://www.instagram.com/alx_tts" target="_blank" class="btn-primary reveal">@alx_tts — Открыть Instagram</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Ink Lab</div>
+  <div class="footer-copy">© 2025 INK LAB School. Все права защищены.</div>
+  <a href="https://t.me/INKLABSCHOOLBOT" target="_blank" style="font-size: 0.65rem; letter-spacing: 0.2em; background: linear-gradient(90deg, #ff6b35, #ff3d7f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; text-transform: uppercase;">Telegram Bot →</a>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursorRing');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    cursor.style.left = mouseX - 4 + 'px';
+    cursor.style.top = mouseY - 4 + 'px';
+  });
+
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    cursorRing.style.left = ringX - 18 + 'px';
+    cursorRing.style.top = ringY - 18 + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'scale(3)';
+      cursorRing.style.transform = 'scale(1.5)';
+      cursorRing.style.borderColor = 'rgba(255,107,53,0.5)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'scale(1)';
+      cursorRing.style.transform = 'scale(1)';
+      cursorRing.style.borderColor = 'rgba(255,255,255,0.3)';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 100);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Animated counters — trigger only on scroll into view
+  const counters = document.querySelectorAll('.stat-num[data-target]');
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.target);
+        const suffix = el.dataset.suffix || '';
+        const duration = 2500;
+        let startTime = null;
+        function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
+        function animate(timestamp) {
+          if (!startTime) startTime = timestamp;
+          const elapsed = timestamp - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = easeOutQuart(progress);
+          el.textContent = Math.round(eased * target) + suffix;
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          }
+        }
+        requestAnimationFrame(animate);
+        counterObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '0px 0px -50px 0px' });
+  counters.forEach(el => counterObserver.observe(el));
+
+  // FAQ
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // Countdown to July 1
+  function updateCountdown() {
+    const target = new Date('2026-07-01T00:00:00');
+    const now = new Date();
+    const diff = target - now;
+    if (diff <= 0) {
+      document.getElementById('cd-days').textContent = '00';
+      document.getElementById('cd-hours').textContent = '00';
+      document.getElementById('cd-minutes').textContent = '00';
+      document.getElementById('cd-seconds').textContent = '00';
+      return;
+    }
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    document.getElementById('cd-days').textContent = String(days).padStart(2, '0');
+    document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('cd-minutes').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('cd-seconds').textContent = String(seconds).padStart(2, '0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Popup after 30 seconds
+  setTimeout(() => {
+    document.getElementById('popup').classList.add('visible');
+  }, 30000);
+
+  document.getElementById('popupClose').addEventListener('click', () => {
+    document.getElementById('popup').classList.remove('visible');
+  });
+
+  document.getElementById('popup').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('popup')) {
+      document.getElementById('popup').classList.remove('visible');
+    }
+  });
+
+  // Buy button
+  document.getElementById('buyBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Страница оплаты скоро будет готова! Напишите нам в Telegram.');
+  });
+</script>
+</body>
+</html>
+</body>
