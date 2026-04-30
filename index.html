@@ -944,6 +944,25 @@
     window.location.href = '/thanks.html';
   });
 </script>
+<!-- STICKY BUTTON -->
+<div id="stickyBtn" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 500; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; pointer-events: none;">
+  <a href="#pricing" style="display: block; padding: 1rem 2rem; background: linear-gradient(90deg, #ff6b35, #ff3d7f); color: #fff; text-decoration: none; font-family: 'Montserrat', sans-serif; font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; font-weight: 500; border-radius: 4px; box-shadow: 0 8px 32px rgba(255,107,53,0.4);">Записаться</a>
+</div>
+
+<script>
+  window.addEventListener('scroll', function() {
+    var btn = document.getElementById('stickyBtn');
+    if (window.scrollY > 400) {
+      btn.style.opacity = '1';
+      btn.style.transform = 'translateY(0)';
+      btn.style.pointerEvents = 'all';
+    } else {
+      btn.style.opacity = '0';
+      btn.style.transform = 'translateY(20px)';
+      btn.style.pointerEvents = 'none';
+    }
+  });
+</script>
 </body>
 </html>
 </body>
